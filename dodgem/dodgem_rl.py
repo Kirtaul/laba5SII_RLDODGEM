@@ -38,21 +38,20 @@ def get_legal_moves(board, color):
 def compute_reward(start, end, board, winner=None):
     sr, sc = start
     er, ec = end
-    reward = -0.01                     # чуть меньше штраф за шаг
+    reward = -0.01                     
 
-    if sr > er:                         # ход вверх (хорошо для чёрных)
+    if sr > er:                         
         reward += 0.6 * (sr - er)
-    elif sr < er:                       # ход вниз (плохо)
+    elif sr < er:                       
         reward -= 1.0
 
-    if sc != ec:                        # горизонтальное смещение нежелательно
+    if sc != ec:                        
         reward -= 0.15
 
-    # Почти победа
     if er == 1:
         reward += 3.0
     elif er == 0:
-        reward += 6.0                   # прямой победный ход (до финальной награды)
+        reward += 6.0   
 
     if winner == 'black':
         reward += 10.0
@@ -61,7 +60,7 @@ def compute_reward(start, end, board, winner=None):
 
     return reward
 
-# --- Приоритетный буфер (PER) ---
+#Приоритетный буфер (PER)
 class PrioritizedReplayBuffer:
     def __init__(self, capacity=50000, alpha=0.6):
         self.capacity = capacity
@@ -108,7 +107,7 @@ class PrioritizedReplayBuffer:
                 self.buffer = list(self.buffer)
                 print(f"[Buffer] Загружено {self.size} переходов")
 
-# --- Нейросеть ---
+#Нейросеть
 class DQN(nn.Module):
     def __init__(self, input_dim=37, output_dim=20):
         super().__init__()
@@ -122,7 +121,7 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-# --- DDQN Агент (Double DQN с PER) ---
+#DDQN с PER
 class DQNAgent:
     def __init__(self, model_file='dodgem_model.pth', buffer_file='dodgem_replay_buffer.pkl',
                  lr=1e-3, gamma=0.99, epsilon=0.8, epsilon_min=0.1, epsilon_decay=0.998,
@@ -180,7 +179,7 @@ class DQNAgent:
         dones = torch.FloatTensor(dones).to(self.device)
         weights = torch.FloatTensor(weights).to(self.device)
 
-        # --- Double DQN (выбор действия основной сетью, оценка целевой) ---
+        #выбор действия основной сетью, оценка целевой
         with torch.no_grad():
             next_actions = self.q_network(next_states).argmax(1, keepdim=True)
             next_q = self.target_network(next_states).gather(1, next_actions).squeeze(1)
@@ -209,7 +208,7 @@ class DQNAgent:
             self.target_network.load_state_dict(self.q_network.state_dict())
             print(f"[Agent] Модель загружена из {self.model_file}")
 
-# --- Минимакс для белых (используется в самоигре) ---
+#Минимакс для белых для самоигры
 class MinimaxWhite:
     def __init__(self, depth=4):
         self.depth = depth
@@ -273,7 +272,7 @@ class MinimaxWhite:
         else:
             min_eval = math.inf
             moves = self._get_all_moves(board, 'black')
-            moves.sort(key=lambda m: m[0][0] - m[1][0], reverse=True)  # чёрным лучше вверх
+            moves.sort(key=lambda m: m[0][0] - m[1][0], reverse=True)
             for start, end in moves:
                 new_board = board.copy()
                 new_board.move_piece(start, end)
@@ -303,7 +302,7 @@ class MinimaxWhite:
                     elif c == 5:
                         score += 5000      # уже победа (check_win сработает раньше)
 
-                    # Штраф за то, что фишка заперта (нет ходов)
+                    # Штраф за то, что фишка заперта
                     if not board.get_valid_moves(r, c, 'white'):
                         score -= 50
 
