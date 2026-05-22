@@ -7,7 +7,7 @@ IMG_WHITE = None
 IMG_BLACK = None
 
 def init_images():
-    """Загружает и масштабирует изображения. Вызывать после создания окна."""
+    """Загружает и масштабирует изображения."""
     global IMG_WHITE, IMG_BLACK
     try:
         image_white = pg.image.load(WHITE_CHECKER_IMG).convert_alpha()
