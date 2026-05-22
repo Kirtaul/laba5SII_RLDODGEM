@@ -74,7 +74,6 @@ class Game:
         pg.quit()
         sys.exit()
 
-    # ---------- Обработчики состояний (без изменений) ----------
     def handle_login(self):
         login_btn, register_btn = draw_login_screen(
             self.screen, self.login_username, self.login_password, self.login_error
@@ -176,8 +175,7 @@ class Game:
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 if back_rect.collidepoint(event.pos):
                     self.state = MENU
-
-    # ---------- Игровая логика ----------
+                    
     def handle_game(self):
         if not self.game_over and not self.moving_piece:
             if self.current_color == 'white':
@@ -199,7 +197,7 @@ class Game:
                 if event.key == pg.K_t:
                     self.self_play_random(2000)
                 if event.key == pg.K_y:
-                    self.self_play_against_minimax(17000)
+                    self.self_play_against_minimax(17000) # самоигра против минимакса, кол-во партий можно изменять
                 if event.key == pg.K_ESCAPE:
                     self.state = MENU
                     self.reset_game()
@@ -297,7 +295,7 @@ class Game:
 
         if self.last_mover == 'black':
             self.bot_thinking = False
-
+    #самоигра против рандомных ходов
     def self_play_random(self, num_games=17000, report_every=50):
         old_state = self.state
         self.state = None
@@ -362,7 +360,7 @@ class Game:
         self.agent.save_model()
         self.state = old_state
         print("\n=== САМОИГРА ЗАВЕРШЕНА ===\n")
-
+    #самоигра против минимакса
     def self_play_against_minimax(self, num_games=17000, report_every=50):
         old_state = self.state
         self.state = None
